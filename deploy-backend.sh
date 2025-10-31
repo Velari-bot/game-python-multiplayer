@@ -24,24 +24,38 @@ apt install -y python3-pip python3-venv nginx certbot python3-certbot-nginx
 
 echo "📁 Creating installation directory..."
 mkdir -p $INSTALL_DIR
+# Ensure proper ownership even if directory exists
+chown -R $SUDO_USER:$SUDO_USER $INSTALL_DIR 2>/dev/null || true
 cd $INSTALL_DIR
 
 # If git repo exists, pull updates
 if [ -d ".git" ]; then
     echo "🔄 Updating from Git..."
-    git pull
+    sudo -u $SUDO_USER git pull || {
+        echo "⚠️  Git pull failed, trying fresh clone..."
+        cd ..
+        rm -rf $INSTALL_DIR
+        mkdir -p $INSTALL_DIR
+        chown -R $SUDO_USER:$SUDO_USER $INSTALL_DIR
+        cd $INSTALL_DIR
+        sudo -u $SUDO_USER git clone https://github.com/Velari-bot/game-python-multiplayer.git .
+    }
 else
     echo "📥 Cloning from GitHub..."
-    git clone https://github.com/Velari-bot/game-python-multiplayer.git .
+    # Clone as the user who ran sudo, not root
+    sudo -u $SUDO_USER git clone https://github.com/Velari-bot/game-python-multiplayer.git .
 fi
+
+# Ensure all files belong to regular user
+chown -R $SUDO_USER:$SUDO_USER $INSTALL_DIR
 
 echo "🐍 Setting up Python environment..."
 if [ ! -d "venv" ]; then
-    python3 -m venv venv
+    sudo -u $SUDO_USER python3 -m venv venv
 fi
-source venv/bin/activate
-pip install --upgrade pip
-pip install -r server/requirements.txt
+chown -R $SUDO_USER:$SUDO_USER venv
+# Run pip as regular user
+sudo -u $SUDO_USER bash -c "source venv/bin/activate && pip install --upgrade pip && pip install -r server/requirements.txt"
 
 echo "🔧 Configuring nginx..."
 sed "s/YOUR_DOMAIN/$DOMAIN/g" nginx-duel-dome.conf > /tmp/duel-dome.conf
