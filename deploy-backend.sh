@@ -65,8 +65,10 @@ if [[ $DOMAIN =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     sed "s/YOUR_IP/$DOMAIN/g" nginx-duel-dome-http.conf > /tmp/duel-dome.conf
     USE_SSL=false
 else
-    echo "🌐 Detected domain - using HTTPS config with SSL"
-    sed "s/YOUR_DOMAIN/$DOMAIN/g" nginx-duel-dome.conf > /tmp/duel-dome.conf
+    echo "🌐 Detected domain - will setup with SSL"
+    # FIRST: Use HTTP-only config to get nginx running
+    echo "   Step 1/2: Setting up HTTP first..."
+    sed "s/YOUR_IP/$DOMAIN/g" nginx-duel-dome-http.conf > /tmp/duel-dome.conf
     USE_SSL=true
 fi
 
@@ -78,19 +80,37 @@ if [ -f /etc/nginx/sites-enabled/default ]; then
     rm /etc/nginx/sites-enabled/default
 fi
 
-# Test nginx config
+# Test nginx config (should work now - no SSL yet)
 nginx -t
+
+# Start nginx with HTTP config
+systemctl reload nginx || systemctl start nginx
 
 # Only try SSL if using a domain
 if [ "$USE_SSL" = true ]; then
-    echo "🔒 Setting up SSL certificate..."
-    systemctl reload nginx
-    certbot --nginx -d $DOMAIN --non-interactive --agree-tos --email admin@$DOMAIN || {
-        echo "⚠️  SSL setup failed. You can run manually: sudo certbot --nginx -d $DOMAIN"
+    echo "🔒 Step 2/2: Getting SSL certificate..."
+    # Get SSL certificate using HTTP-01 challenge
+    certbot certonly --nginx -d $DOMAIN --non-interactive --agree-tos --email admin@$DOMAIN --redirect || {
+        echo "⚠️  SSL setup failed. Trying standalone method..."
+        systemctl stop nginx
+        certbot certonly --standalone -d $DOMAIN --non-interactive --agree-tos --email admin@$DOMAIN || {
+            echo "❌ SSL failed. Continuing with HTTP only."
+            echo "   You can try manually: sudo certbot --nginx -d $DOMAIN"
+            systemctl start nginx
+            USE_SSL=false
+        }
+        systemctl start nginx
     }
+    
+    # If SSL succeeded, update to HTTPS config
+    if [ "$USE_SSL" = true ] && [ -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ]; then
+        echo "✅ SSL certificate obtained! Updating nginx to HTTPS..."
+        sed "s/YOUR_DOMAIN/$DOMAIN/g" nginx-duel-dome.conf > /tmp/duel-dome.conf
+        cp /tmp/duel-dome.conf /etc/nginx/sites-available/duel-dome
+        nginx -t && systemctl reload nginx
+    fi
 else
     echo "⚠️  Using HTTP only (no SSL). For production, use a domain name and SSL."
-    systemctl reload nginx
 fi
 
 echo "⚙️  Configuring systemd service..."
