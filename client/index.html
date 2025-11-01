@@ -144,12 +144,17 @@
     <!-- WebSocket backend URL can be set via script tag data attribute -->
     <script src="script.js" data-ws-backend-url=""></script>
     <script>
-        // Backend URL for Vercel deployment
-        // Using HTTP for now - SSL will be added once DNS fully propagates
-        // Note: HTTPS sites (Vercel) can't connect to ws://, so use local file for testing
+        // Backend URL configuration
+        // For local network play, use your Mac's WiFi IP
+        // For VPS deployment, use your domain
+        
+        // LOCAL NETWORK (WiFi): Use for same WiFi play
+        // window.WS_BACKEND_URL = 'ws://172.16.0.71:3000/ws';
+        
+        // VPS (HTTP): Use for INTERNET play (any two PCs)
         window.WS_BACKEND_URL = 'ws://45.77.145.57/ws';
         
-        // Once SSL is working (after DNS propagates):
+        // VPS (HTTPS): Uncomment when SSL is ready
         // window.WS_BACKEND_URL = 'wss://dueldome.duckdns.org/ws';
     </script>
 </body>
