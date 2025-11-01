@@ -209,6 +209,15 @@ app = FastAPI(lifespan=lifespan)
 # Allow all origins in production, or specify your Vercel domain
 allowed_origins = os.getenv("CORS_ORIGINS", "*").split(",")
 
+# Add Vercel domain explicitly
+if allowed_origins == ["*"]:
+    allowed_origins = [
+        "*",  # Allow all for development
+        "https://game-python-multiplayer.vercel.app",
+        "http://localhost:3000",
+        "http://localhost:8000"
+    ]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,

@@ -144,8 +144,12 @@
     <!-- WebSocket backend URL can be set via script tag data attribute -->
     <script src="script.js" data-ws-backend-url=""></script>
     <script>
-        // Alternative: Set backend URL at runtime
-        // Uncomment and update for production deployment:
+        // Backend URL for Vercel deployment
+        // IMPORTANT: Using ws:// on HTTPS site will be blocked by browsers
+        // For testing: use HTTP version of Vercel or get SSL for backend
+        window.WS_BACKEND_URL = 'ws://45.77.145.57/ws';
+        
+        // For production with SSL: 
         // window.WS_BACKEND_URL = 'wss://your-domain.com/ws';
     </script>
 </body>
