@@ -145,12 +145,12 @@
     <script src="script.js" data-ws-backend-url=""></script>
     <script>
         // Backend URL for Vercel deployment
-        // IMPORTANT: Using ws:// on HTTPS site will be blocked by browsers
-        // For testing: use HTTP version of Vercel or get SSL for backend
-        window.WS_BACKEND_URL = 'wss://dueldome.duckdns.org/ws';
+        // Using HTTP for now - SSL will be added once DNS fully propagates
+        // Note: HTTPS sites (Vercel) can't connect to ws://, so use local file for testing
+        window.WS_BACKEND_URL = 'ws://45.77.145.57/ws';
         
-        // For production with SSL: 
-        // window.WS_BACKEND_URL = 'wss://your-domain.com/ws';
+        // Once SSL is working (after DNS propagates):
+        // window.WS_BACKEND_URL = 'wss://dueldome.duckdns.org/ws';
     </script>
 </body>
 </html>
