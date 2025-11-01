@@ -1181,7 +1181,7 @@ class DuelDomeClient {
         this.drawBackgroundParticles(arenaRadius);
         
         // Draw arena (with gradient and glow)
-        this.drawArena(arenaRadius, state.arena_event);
+        this.drawArena(arenaRadius, state.arena_event, state);
         
         // Draw grid (subtle)
         this.drawGrid(arenaRadius);
@@ -1377,7 +1377,7 @@ class DuelDomeClient {
         this.ctx.globalAlpha = 1;
     }
     
-    drawArena(arenaRadius, arenaEvent) {
+    drawArena(arenaRadius, arenaEvent, state) {
         const centerX = this.centerX;
         const centerY = this.centerY;
         const radius = arenaRadius * this.scale;
