@@ -444,6 +444,18 @@ async def root():
         return {"message": "Client files not found. Please check that client/index.html exists."}
 
 
+@app.get("/health")
+async def health():
+    """Health check endpoint for deployment monitoring."""
+    return {
+        "status": "ok",
+        "service": "duel-dome",
+        "connections": len(connections),
+        "players": len(game_state.players),
+        "match_active": game_state.match_active
+    }
+
+
 @app.get("/style.css")
 async def style():
     """Serve CSS file."""
