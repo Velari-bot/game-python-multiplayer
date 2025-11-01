@@ -1,0 +1,14 @@
+# Copy these commands and paste into your VPS SSH session
+
+cd /opt/duel-dome
+git pull
+sudo bash deploy-backend.sh dueldome.duckdns.org
+
+# After deployment completes, test:
+curl https://dueldome.duckdns.org/health
+
+# If that works, check service status:
+sudo systemctl status duel-dome
+
+# View logs:
+sudo journalctl -u duel-dome -n 50
