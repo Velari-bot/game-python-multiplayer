@@ -58,7 +58,18 @@ chown -R $SUDO_USER:$SUDO_USER venv
 sudo -u $SUDO_USER bash -c "source venv/bin/activate && pip install --upgrade pip && pip install -r server/requirements.txt"
 
 echo "🔧 Configuring nginx..."
-sed "s/YOUR_DOMAIN/$DOMAIN/g" nginx-duel-dome.conf > /tmp/duel-dome.conf
+
+# Check if using IP or domain
+if [[ $DOMAIN =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "📍 Detected IP address - using HTTP-only config (no SSL)"
+    sed "s/YOUR_IP/$DOMAIN/g" nginx-duel-dome-http.conf > /tmp/duel-dome.conf
+    USE_SSL=false
+else
+    echo "🌐 Detected domain - using HTTPS config with SSL"
+    sed "s/YOUR_DOMAIN/$DOMAIN/g" nginx-duel-dome.conf > /tmp/duel-dome.conf
+    USE_SSL=true
+fi
+
 cp /tmp/duel-dome.conf /etc/nginx/sites-available/duel-dome
 ln -sf /etc/nginx/sites-available/duel-dome /etc/nginx/sites-enabled/
 
@@ -70,11 +81,17 @@ fi
 # Test nginx config
 nginx -t
 
-echo "🔒 Setting up SSL certificate..."
-systemctl reload nginx
-certbot --nginx -d $DOMAIN --non-interactive --agree-tos --email admin@$DOMAIN || {
-    echo "⚠️  SSL setup failed. You may need to run: certbot --nginx -d $DOMAIN"
-}
+# Only try SSL if using a domain
+if [ "$USE_SSL" = true ]; then
+    echo "🔒 Setting up SSL certificate..."
+    systemctl reload nginx
+    certbot --nginx -d $DOMAIN --non-interactive --agree-tos --email admin@$DOMAIN || {
+        echo "⚠️  SSL setup failed. You can run manually: sudo certbot --nginx -d $DOMAIN"
+    }
+else
+    echo "⚠️  Using HTTP only (no SSL). For production, use a domain name and SSL."
+    systemctl reload nginx
+fi
 
 echo "⚙️  Configuring systemd service..."
 sed "s|/opt/duel-dome|$INSTALL_DIR|g" duel-dome.service > /tmp/duel-dome.service
