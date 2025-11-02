@@ -28,7 +28,7 @@ client_ips: Dict[str, str] = {}  # player_id -> client_ip (to prevent multiple t
 
 # Game loop task
 game_loop_task: asyncio.Task = None
-TICK_RATE = 60  # 60 updates per second for smoother gameplay
+TICK_RATE = 30  # 30 updates per second (optimized for network)
 TICK_INTERVAL = 1.0 / TICK_RATE
 
 

@@ -500,7 +500,7 @@ class DuelDomeClient {
                 if (this.ws && this.ws.readyState === WebSocket.OPEN) {
                     this.sendInput();
                 }
-            }, 16); // ~60Hz for smoother input
+            }, 33); // ~30Hz to reduce network load
         }
     }
     
@@ -992,9 +992,9 @@ class DuelDomeClient {
     
     sendInput() {
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-            // Throttle to prevent too many messages, but still send frequently
+            // Throttle to prevent too many messages
             const now = Date.now();
-            if (!this.lastInputSend || now - this.lastInputSend >= 16) { // ~60Hz
+            if (!this.lastInputSend || now - this.lastInputSend >= 33) { // ~30Hz
                 this.lastInputSend = now;
                 try {
                     this.ws.send(JSON.stringify({
