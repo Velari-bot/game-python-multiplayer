@@ -594,7 +594,7 @@ class GameState:
                 # Apply speed boost power-up
                 speed_multiplier = 1.0
                 if player.active_powerup == 'speed_boost' and time.time() < player.powerup_end_time:
-                    speed_multiplier = 1.4  # +40% speed
+                    speed_multiplier = 2.0  # +100% speed (doubled!)
                 
                 # Apply event multipliers to base speed
                 effective_move_speed = Player.MOVE_SPEED * self.event_multipliers['move_speed'] * speed_multiplier
@@ -761,7 +761,7 @@ class GameState:
         self.check_match_end()
     
     def spawn_powerups(self, dt: float):
-        """Spawn power-ups randomly every 10-20 seconds."""
+        """Spawn power-ups randomly every 8-15 seconds."""
         # No power-ups during sudden-death
         if self.sudden_death_active:
             self.powerups.clear()
@@ -775,7 +775,7 @@ class GameState:
         if self.last_powerup_spawn == 0.0:
             self.last_powerup_spawn = current_time
         
-        # Spawn every 10-20 seconds (randomized)
+        # Spawn every 8-15 seconds (more frequent!)
         time_since_last_spawn = current_time - self.last_powerup_spawn
         if time_since_last_spawn >= self.next_powerup_spawn and len(self.powerups) < 3:
             # Spawn a power-up at random location within arena
@@ -785,14 +785,20 @@ class GameState:
             x = math.cos(angle) * distance
             y = math.sin(angle) * distance
             
-            # Random power-up type
-            power_types = ['speed_boost', 'double_shot', 'shield', 'invisibility', 'ricochet']
+            # Weighted spawn - speed/double shot more common
+            power_types = [
+                'speed_boost', 'speed_boost',  # 2x chance
+                'double_shot', 'double_shot',  # 2x chance
+                'shield',
+                'invisibility',
+                'ricochet'
+            ]
             power_type = random.choice(power_types)
             
             self.powerups.append(PowerUp(x, y, power_type))
             self.last_powerup_spawn = current_time
-            # Next spawn in 10-20 seconds
-            self.next_powerup_spawn = 10.0 + random.random() * 10.0
+            # Next spawn in 8-15 seconds (more frequent!)
+            self.next_powerup_spawn = 8.0 + random.random() * 7.0
     
     def check_powerup_collection(self):
         """Check if players collect power-ups."""

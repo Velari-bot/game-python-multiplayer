@@ -1801,8 +1801,21 @@ class DuelDomeClient {
             this.ctx.shadowBlur = 0;
         }
         
-        // Draw power-up indicator (small icon above player)
+        // Draw power-up indicator with golden glow for speed boost
         if (player.active_powerup && currentTime < player.powerup_end_time) {
+            // Golden pulsing ring for speed boost
+            if (player.active_powerup === 'speed_boost') {
+                this.ctx.save();
+                this.ctx.strokeStyle = '#FFAA00';
+                this.ctx.lineWidth = 3;
+                this.ctx.shadowBlur = 15;
+                this.ctx.shadowColor = '#FFAA00';
+                this.ctx.beginPath();
+                this.ctx.arc(x, y, radius + 10 + Math.sin(currentTime / 100) * 3, 0, Math.PI * 2);
+                this.ctx.stroke();
+                this.ctx.restore();
+            }
+            
             const powerIcons = {
                 'speed_boost': '⚡',
                 'double_shot': '💥',
