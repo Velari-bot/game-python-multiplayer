@@ -341,6 +341,12 @@ async def websocket_endpoint(websocket: WebSocket):
                 elif msg_type == 'start_match':
                     # Either player can start match
                     if len(game_state.players) == 2:
+                        # Reset match state if it's stuck (waiting or not in countdown)
+                        if game_state.match_active and game_state.match_state == 'waiting':
+                            print(f"Match stuck in active+waiting state, resetting...")
+                            game_state.match_active = False
+                            game_state.round_active = False
+                        
                         if not game_state.match_active:
                             print(f"Player {player_id} starting match...")
                             arena_manager.clear_event(game_state)
@@ -360,7 +366,7 @@ async def websocket_endpoint(websocket: WebSocket):
                                     print(f"  ✗ Failed to send to {conn_id}: {e}")
                             print("Match start messages sent")
                         else:
-                            print(f"Match already active, ignoring start request from {player_id}")
+                            print(f"Match already active (state: {game_state.match_state}), ignoring start request from {player_id}")
                 
             except json.JSONDecodeError:
                 pass
