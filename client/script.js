@@ -497,25 +497,9 @@ class DuelDomeClient {
     }
     
     connectToGame(gameCode) {
-        // Connect and send game code
+        // Just connect - backend doesn't support rooms yet
+        // Game code is for display only
         this.connect();
-        
-        // Wait for connection before sending game code
-        const checkConnection = () => {
-            if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-                this.ws.send(JSON.stringify({
-                    type: 'join_game',
-                    game_code: gameCode.toUpperCase()
-                }));
-            } else if (this.ws && this.ws.readyState === WebSocket.CONNECTING) {
-                setTimeout(checkConnection, 100);
-            } else {
-                // Connection failed, try again
-                setTimeout(() => this.connectToGame(gameCode), 2000);
-            }
-        };
-        
-        setTimeout(checkConnection, 100);
     }
     
     handleMessage(message) {
