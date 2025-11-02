@@ -572,9 +572,15 @@ class DuelDomeClient {
                 break;
             
             case 'match_start':
-                // Switch to gameplay screen
-                this.screenManager.show('gameplay');
-                this.initGameplay();
+                try {
+                    console.log('Match starting - switching to gameplay');
+                    // Switch to gameplay screen
+                    this.screenManager.show('gameplay');
+                    this.initGameplay();
+                    console.log('Match start complete');
+                } catch (error) {
+                    console.error('Error during match start:', error);
+                }
                 break;
             
             case 'round_start':
