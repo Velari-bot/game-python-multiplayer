@@ -229,8 +229,9 @@ class DuelDomeClient {
     
     leaveLobby() {
         if (this.ws) {
-            this.ws.close();
+            this.ws.close(1000, 'User left lobby'); // Normal closure
         }
+        this.ws = null; // Clear reference
         this.screenManager.show('home');
         this.gameCode = null;
         this.isHost = false;
@@ -253,8 +254,9 @@ class DuelDomeClient {
     
     backToMenu() {
         if (this.ws) {
-            this.ws.close();
+            this.ws.close(1000, 'User returned to menu'); // Normal closure
         }
+        this.ws = null; // Clear reference
         this.screenManager.show('home');
         this.gameCode = null;
         this.isHost = false;
@@ -499,6 +501,13 @@ class DuelDomeClient {
     connectToGame(gameCode) {
         // Just connect - backend doesn't support rooms yet
         // Game code is for display only
+        
+        // Don't reconnect if already connected!
+        if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
+            console.log('Already connected, skipping reconnect');
+            return;
+        }
+        
         this.connect();
     }
     
