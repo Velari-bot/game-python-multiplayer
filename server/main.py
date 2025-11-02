@@ -350,11 +350,15 @@ async def websocket_endpoint(websocket: WebSocket):
                             start_message = json.dumps({
                                 'type': 'match_start'
                             })
-                            for ws in list(connections.values()):
+                            print(f"Sending match_start to {len(connections)} connections")
+                            for conn_id, ws in list(connections.items()):
                                 try:
+                                    print(f"  Sending to {conn_id}...")
                                     await ws.send_text(start_message)
-                                except Exception:
-                                    pass
+                                    print(f"  ✓ Sent to {conn_id}")
+                                except Exception as e:
+                                    print(f"  ✗ Failed to send to {conn_id}: {e}")
+                            print("Match start messages sent")
                         else:
                             print(f"Match already active, ignoring start request from {player_id}")
                 
