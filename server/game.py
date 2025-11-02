@@ -211,14 +211,14 @@ class Player:
         current_time = time.time()
         
         if power_type == 'speed_boost':
-            self.powerup_end_time = current_time + 5.0  # 5 seconds
+            self.powerup_end_time = current_time + 8.0  # 8 seconds (longer duration)
         elif power_type == 'double_shot':
-            self.powerup_end_time = current_time + 10.0  # 10 seconds
+            self.powerup_end_time = current_time + 12.0  # 12 seconds (longer)
             self.double_shot_active = True
         elif power_type == 'shield':
-            self.shields = 1
+            self.shields = 2  # 2 shields now
         elif power_type == 'invisibility':
-            self.invisible_until = current_time + 3.0  # 3 seconds
+            self.invisible_until = current_time + 4.0  # 4 seconds (longer)
         elif power_type == 'ricochet':
             self.powerup_end_time = current_time + 15.0  # 15 seconds
     
