@@ -238,11 +238,14 @@ class DuelDomeClient {
     }
     
     startMatch() {
-        // Only host can start
-        if (this.isHost && this.ws && this.ws.readyState === WebSocket.OPEN) {
+        // Either player can start (no host/guest distinction in single-room mode)
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            console.log('Starting match...');
             this.ws.send(JSON.stringify({
                 type: 'start_match'
             }));
+        } else {
+            console.error('Cannot start match - not connected to server');
         }
     }
     
