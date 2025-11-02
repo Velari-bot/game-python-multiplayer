@@ -339,10 +339,10 @@ async def websocket_endpoint(websocket: WebSocket):
                     inputs = message.get('inputs', {})
                     game_state.update_player_inputs(player_id, inputs)
                 elif msg_type == 'start_match':
-                    # Host wants to start match
-                    if player_id == list(connections.keys())[0] and len(game_state.players) == 2:
-                        # First player (host) wants to start
+                    # Either player can start match
+                    if len(game_state.players) == 2:
                         if not game_state.match_active:
+                            print(f"Player {player_id} starting match...")
                             arena_manager.clear_event(game_state)
                             game_state.start_match()
                             
@@ -355,6 +355,8 @@ async def websocket_endpoint(websocket: WebSocket):
                                     await ws.send_text(start_message)
                                 except Exception:
                                     pass
+                        else:
+                            print(f"Match already active, ignoring start request from {player_id}")
                 
             except json.JSONDecodeError:
                 pass
