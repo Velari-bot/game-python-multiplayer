@@ -94,6 +94,9 @@ class DuelDomeClient {
         // Setup UI event handlers
         this.setupUIHandlers();
         
+        // Setup mobile controls
+        this.setupMobileControls();
+        
         // Start on home screen
         this.screenManager.show('home');
         
@@ -803,6 +806,117 @@ class DuelDomeClient {
                 </div>
             `;
             statsEl.innerHTML = statsHtml;
+        }
+    }
+    
+    setupMobileControls() {
+        // Detect if touch device
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        
+        if (isTouchDevice) {
+            const mobileControls = document.getElementById('mobile-controls');
+            if (mobileControls) {
+                mobileControls.classList.add('active');
+            }
+        }
+        
+        // Virtual Joystick
+        const joystick = document.getElementById('joystick');
+        const joystickStick = document.getElementById('joystick-stick');
+        
+        if (joystick && joystickStick) {
+            let joystickActive = false;
+            let joystickCenterX = 60;
+            let joystickCenterY = 60;
+            
+            const updateJoystick = (touchX, touchY) => {
+                const rect = joystick.getBoundingClientRect();
+                const centerX = rect.left + 60;
+                const centerY = rect.top + 60;
+                
+                let dx = touchX - centerX;
+                let dy = touchY - centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const maxDistance = 30;
+                
+                if (distance > maxDistance) {
+                    dx = (dx / distance) * maxDistance;
+                    dy = (dy / distance) * maxDistance;
+                }
+                
+                joystickStick.style.left = (60 + dx) + 'px';
+                joystickStick.style.top = (60 + dy) + 'px';
+                
+                // Update input state
+                const deadzone = 5;
+                if (Math.abs(dx) > deadzone || Math.abs(dy) > deadzone) {
+                    this.inputState.w = dy < -deadzone;
+                    this.inputState.s = dy > deadzone;
+                    this.inputState.a = dx < -deadzone;
+                    this.inputState.d = dx > deadzone;
+                } else {
+                    this.inputState.w = false;
+                    this.inputState.s = false;
+                    this.inputState.a = false;
+                    this.inputState.d = false;
+                }
+            };
+            
+            const resetJoystick = () => {
+                joystickStick.style.left = '30px';
+                joystickStick.style.top = '30px';
+                this.inputState.w = false;
+                this.inputState.s = false;
+                this.inputState.a = false;
+                this.inputState.d = false;
+            };
+            
+            joystick.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                joystickActive = true;
+                updateJoystick(e.touches[0].clientX, e.touches[0].clientY);
+            });
+            
+            joystick.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (joystickActive) {
+                    updateJoystick(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            });
+            
+            joystick.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                joystickActive = false;
+                resetJoystick();
+            });
+        }
+        
+        // Shoot Button
+        const btnShoot = document.getElementById('btn-mobile-shoot');
+        if (btnShoot) {
+            btnShoot.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                this.inputState.shoot = true;
+            });
+            
+            btnShoot.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                this.inputState.shoot = false;
+            });
+        }
+        
+        // Dash Button
+        const btnDash = document.getElementById('btn-mobile-dash');
+        if (btnDash) {
+            btnDash.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                this.inputState.dash = true;
+            });
+            
+            btnDash.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                this.inputState.dash = false;
+            });
         }
     }
     

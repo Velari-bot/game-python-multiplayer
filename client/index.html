@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Audiowide&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="mobile-controls.css">
 </head>
 <body>
     <!-- Background Animation Layer -->
@@ -114,6 +115,21 @@
             <div class="disconnect-message">
                 <h2>Opponent Disconnected</h2>
                 <p>Waiting for reconnect...</p>
+            </div>
+        </div>
+        
+        <!-- Mobile Touch Controls -->
+        <div class="mobile-controls" id="mobile-controls">
+            <!-- Virtual Joystick -->
+            <div class="virtual-joystick" id="joystick">
+                <div class="joystick-base"></div>
+                <div class="joystick-stick" id="joystick-stick"></div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <div class="mobile-btn btn-shoot" id="btn-mobile-shoot">FIRE</div>
+                <div class="mobile-btn btn-dash" id="btn-mobile-dash">DASH</div>
             </div>
         </div>
     </div>
