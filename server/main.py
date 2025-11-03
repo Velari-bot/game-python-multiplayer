@@ -101,7 +101,7 @@ async def game_loop():
             # CRITICAL: Only remove players in websocket_endpoint's finally block
             # The game loop should NOT aggressively remove players on send failures
             # This prevents removing players prematurely when connections are temporarily unstable
-            should_broadcast = game_state.round_active or game_state.match_state in ["countdown", "round_end", "match_end"]
+            should_broadcast = game_state.round_active or game_state.match_state in ["countdown", "playing", "round_end", "match_end"]
             
             # Debug logging
             if game_state.match_active and not should_broadcast:
