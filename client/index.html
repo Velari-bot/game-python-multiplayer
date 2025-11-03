@@ -160,18 +160,19 @@
     <!-- WebSocket backend URL can be set via script tag data attribute -->
     <script src="script.js" data-ws-backend-url=""></script>
     <script>
-        // Backend URL configuration
-        // For local network play, use your Mac's WiFi IP
-        // For VPS deployment, use your domain
+        // AUTO-DETECT WebSocket URL (no more manual IP changes!)
+        const hostname = window.location.hostname;
+        const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
         
-        // LOCAL NETWORK (WiFi): Use for same WiFi play
-        window.WS_BACKEND_URL = 'ws://172.16.0.71:3000/ws';
+        if (isLocalhost) {
+            window.WS_BACKEND_URL = 'ws://localhost:3000/ws';
+        } else {
+            // Use the same IP you're accessing the game from
+            window.WS_BACKEND_URL = `ws://${hostname}:3000/ws`;
+        }
         
-        // VPS (HTTP): Use for INTERNET play (any two PCs)
-        // window.WS_BACKEND_URL = 'ws://45.77.145.57/ws';
-        
-        // VPS (HTTPS): Uncomment when SSL is ready
-        // window.WS_BACKEND_URL = 'wss://dueldome.duckdns.org/ws';
+        console.log('🚀 WebSocket URL:', window.WS_BACKEND_URL);
+        console.log('📍 Accessed via:', hostname);
     </script>
 </body>
 </html>
