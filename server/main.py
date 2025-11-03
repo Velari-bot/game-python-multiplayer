@@ -103,6 +103,10 @@ async def game_loop():
             # This prevents removing players prematurely when connections are temporarily unstable
             should_broadcast = game_state.round_active or game_state.match_state in ["countdown", "playing", "round_end", "match_end"]
             
+            # EXTREME DEBUG - log every loop iteration when match is active
+            if game_state.match_active:
+                print(f"🔄 Game loop: match_active={game_state.match_active}, round_active={game_state.round_active}, match_state={game_state.match_state}, should_broadcast={should_broadcast}, connections={len(connections)}")
+            
             # Debug logging
             if game_state.match_active and not should_broadcast:
                 print(f"⚠️  Match active but NOT broadcasting! round_active={game_state.round_active}, match_state={game_state.match_state}")
