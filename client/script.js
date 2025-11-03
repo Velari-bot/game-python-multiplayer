@@ -296,24 +296,46 @@ class DuelDomeClient {
     
     // Initialize gameplay (called when match starts)
     initGameplay() {
+        console.log('[initGameplay] Starting...');
+        
         if (!this.canvas) {
             this.canvas = document.getElementById('game-canvas');
             if (this.canvas) {
                 this.ctx = this.canvas.getContext('2d');
+                console.log('[initGameplay] Canvas initialized');
+            } else {
+                console.error('[initGameplay] Canvas not found!');
+                return;
             }
         }
         
         if (this.canvas && this.ctx) {
             this.resizeCanvas();
-            window.addEventListener('resize', () => this.resizeCanvas());
-            this.setupInputHandlers();
+            console.log('[initGameplay] Canvas resized');
+            
+            // Only setup input handlers once
+            if (!this.inputHandlersSetup) {
+                window.addEventListener('resize', () => this.resizeCanvas());
+                this.setupInputHandlers();
+                this.inputHandlersSetup = true;
+                console.log('[initGameplay] Input handlers setup');
+            }
             
             // Initialize background particles
-            this.initBackgroundParticles();
+            if (!this.backgroundParticles || this.backgroundParticles.length === 0) {
+                this.initBackgroundParticles();
+                console.log('[initGameplay] Background particles initialized');
+            }
             
-            // Start render loop
-            this.lastRenderTime = performance.now();
-            this.render();
+            // Start render loop (if not already running)
+            if (!this.rendering) {
+                this.lastRenderTime = performance.now();
+                this.rendering = true;
+                this.render();
+                console.log('[initGameplay] Render loop started');
+            }
+            
+            console.log('[initGameplay] Complete!');
         }
     }
     
