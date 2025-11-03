@@ -1251,32 +1251,25 @@ class DuelDomeClient {
         this.ctx.fillStyle = '#000000';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
-        if (!this.gameState || !this.gameState.players || Object.keys(this.gameState.players).length < 2) {
-            // Show waiting message
+        // Only show waiting if we don't have game state yet
+        if (!this.gameState) {
             this.ctx.restore();
             this.ctx.fillStyle = '#00ffaa';
             this.ctx.font = '24px JetBrains Mono';
             this.ctx.textAlign = 'center';
-            this.ctx.fillText('Waiting for players...', this.centerX, this.centerY);
+            this.ctx.fillText('Connecting...', this.centerX, this.centerY);
             return;
         }
         
-        // Check if match is active - if not, show waiting for match start
+        // If match is active or in countdown, just render the game
+        // Don't check player count - trust the server
         if (!this.gameState.match_active && this.gameState.match_state === 'waiting') {
-            // Match hasn't started yet - might be in lobby
+            // Only show waiting screen if truly in lobby (not playing)
             this.ctx.restore();
             this.ctx.fillStyle = '#00ffaa';
             this.ctx.font = '24px JetBrains Mono';
             this.ctx.textAlign = 'center';
-            const playerCount = Object.keys(this.gameState.players || {}).length;
-            if (playerCount < 2) {
-                this.ctx.fillText('Waiting for players...', this.centerX, this.centerY);
-            } else {
-                this.ctx.fillText('Waiting for match to start...', this.centerX, this.centerY);
-                this.ctx.font = '16px JetBrains Mono';
-                this.ctx.fillStyle = '#888';
-                this.ctx.fillText('(Host must click START MATCH)', this.centerX, this.centerY + 30);
-            }
+            this.ctx.fillText('In Lobby - Click START MATCH', this.centerX, this.centerY);
             return;
         }
         
