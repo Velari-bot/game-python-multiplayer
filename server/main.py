@@ -357,6 +357,7 @@ async def websocket_endpoint(websocket: WebSocket):
                             print(f"Player {player_id} starting match...")
                             arena_manager.clear_event(game_state)
                             game_state.start_match()
+                            print(f"Match started: match_active={game_state.match_active}, match_state={game_state.match_state}, countdown={game_state.countdown}")
                             
                             # Notify all players that match is starting
                             start_message = json.dumps({
