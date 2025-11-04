@@ -339,10 +339,13 @@ async def websocket_endpoint(websocket: WebSocket):
         
         # Handle incoming messages
         while True:
+            print(f"⏳ [{player_id[:8]}] Waiting for message...")
             data = await websocket.receive_text()
+            print(f"📨 [{player_id[:8]}] Received: {data[:80]}")
             try:
                 message = json.loads(data)
                 msg_type = message.get('type')
+                print(f"📬 [{player_id[:8]}] Type: {msg_type}")
                 
                 if msg_type == 'input':
                     # Update player inputs
