@@ -663,6 +663,16 @@ class DuelDomeClient {
                 break;
             
             case 'game_state':
+                console.log('📦 Got game_state:', message.data.match_state, '| players:', Object.keys(message.data.players || {}).length);
+                
+                // Auto-hide disconnect overlay when 2 players present
+                if (message.data.players && Object.keys(message.data.players).length >= 2) {
+                    const disconnectOverlay = document.getElementById('disconnect-overlay');
+                    if (disconnectOverlay) {
+                        disconnectOverlay.classList.add('hidden');
+                    }
+                }
+                
                 // Only process game state if match is active or we're on gameplay screen
                 // This prevents showing game state in lobby
                 if (!this.gameState && message.data.match_state === 'waiting' && !message.data.match_active) {
