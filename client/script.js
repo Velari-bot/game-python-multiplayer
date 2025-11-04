@@ -605,6 +605,11 @@ class DuelDomeClient {
             case 'match_start':
                 try {
                     console.log('Match starting - switching to gameplay');
+                    // Hide disconnect overlay
+                    const disconnectOverlay = document.getElementById('disconnect-overlay');
+                    if (disconnectOverlay) {
+                        disconnectOverlay.classList.add('hidden');
+                    }
                     // Switch to gameplay screen
                     this.screenManager.show('gameplay');
                     this.initGameplay();
