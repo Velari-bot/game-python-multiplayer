@@ -253,9 +253,18 @@ class DuelDomeClient {
     }
     
     playAgain() {
-        // Reset and go back to lobby
-        this.screenManager.show('lobby');
-        this.updateLobbyDisplay();
+        // Send start_match message to backend to start a new match
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            console.log('Play Again - restarting match...');
+            this.ws.send(JSON.stringify({
+                type: 'start_match'
+            }));
+        } else {
+            console.error('Cannot restart - not connected to server');
+            // Fall back to lobby
+            this.screenManager.show('lobby');
+            this.updateLobbyDisplay();
+        }
     }
     
     backToMenu() {
@@ -631,10 +640,12 @@ class DuelDomeClient {
                 break;
             
             case 'player_disconnected':
-                // Show disconnect overlay
-                const disconnectOverlay = document.getElementById('disconnect-overlay');
-                if (disconnectOverlay) {
-                    disconnectOverlay.classList.remove('hidden');
+                // Show disconnect overlay only if we're in an active match
+                if (this.gameState && this.gameState.match_active) {
+                    const disconnectOverlay = document.getElementById('disconnect-overlay');
+                    if (disconnectOverlay) {
+                        disconnectOverlay.classList.remove('hidden');
+                    }
                 }
                 break;
             
