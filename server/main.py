@@ -103,11 +103,7 @@ async def game_loop():
             # This prevents removing players prematurely when connections are temporarily unstable
             should_broadcast = game_state.round_active or game_state.match_state in ["countdown", "playing", "round_end", "match_end"]
             
-            # EXTREME DEBUG - log every loop iteration when match is active
-            if game_state.match_active:
-                print(f"🔄 Game loop: match_active={game_state.match_active}, round_active={game_state.round_active}, match_state={game_state.match_state}, should_broadcast={should_broadcast}, connections={len(connections)}")
-            
-            # Debug logging
+            # Only log if there's a problem (not every loop)
             if game_state.match_active and not should_broadcast:
                 print(f"⚠️  Match active but NOT broadcasting! round_active={game_state.round_active}, match_state={game_state.match_state}")
             
@@ -339,13 +335,10 @@ async def websocket_endpoint(websocket: WebSocket):
         
         # Handle incoming messages
         while True:
-            print(f"⏳ [{player_id[:8]}] Waiting for message...")
             data = await websocket.receive_text()
-            print(f"📨 [{player_id[:8]}] Received: {data[:80]}")
             try:
                 message = json.loads(data)
                 msg_type = message.get('type')
-                print(f"📬 [{player_id[:8]}] Type: {msg_type}")
                 
                 if msg_type == 'input':
                     # Update player inputs
