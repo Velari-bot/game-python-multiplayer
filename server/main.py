@@ -114,16 +114,24 @@ async def game_loop():
                     'data': state_dict
                 })
                 
+                # Debug: log broadcast attempt
+                print(f"📡 Broadcasting game_state to {len(connections)} clients (state: {game_state.match_state})")
+                
                 # Send to all connected clients
                 # If send fails, don't immediately remove - connection might recover
+                sent_count = 0
                 for player_id, ws in list(connections.items()):
                     try:
                         await ws.send_text(message)
+                        sent_count += 1
                     except Exception as e:
                         # Log but don't remove - websocket_endpoint will handle actual disconnects
                         # This prevents race conditions where a player is removed while still connected
                         print(f"Game loop: Failed to send to {player_id} (might be temporary): {e}")
                         # Don't remove here - let the websocket_endpoint's finally block handle it
+                
+                if sent_count > 0:
+                    print(f"✅ Sent game_state to {sent_count}/{len(connections)} clients")
             
             # Handle match state transitions
             if game_state.match_state == "countdown" and game_state.countdown == 0:
